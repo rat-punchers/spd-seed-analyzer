@@ -2,7 +2,7 @@
   "name": "spd-seed-analyzer",
   "private": true,
   "version": "0.1.0",
-  "repository": "https://github.com/nerd-coder/spd-seed-analyzer",
+  "repository": "https://github.com/rat-punchers/spd-seed-analyzer",
   "type": "module",
   "packageManager": "bun@1.3.14",
   "workspaces": [
