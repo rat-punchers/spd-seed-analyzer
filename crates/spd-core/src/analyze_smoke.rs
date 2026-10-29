@@ -6,6 +6,9 @@ mod room_reward_regressions;
 #[path = "analyze_smoke/map_terrain.rs"]
 mod map_terrain;
 
+#[path = "analyze_smoke/map_item_list_parity.rs"]
+mod map_item_list_parity;
+
 #[test]
 fn analyze_seed_smoke() {
     let r = analyze_seed("GFX-PZH-DCH", 4).expect("analyze");

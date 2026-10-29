@@ -16,7 +16,8 @@ const ROOMS: Record<string, string> = {
   LibraryRoom: 'Library, behind a locked door',
   MagicWellRoom: 'Magic well room, behind a locked door',
   RunestoneRoom: 'Runestone room, behind a locked door',
-  StatueRoom: 'Statue room, behind a locked door',
+  StatueRoom:
+    'Statue room, behind a locked door, carried by an animated statue',
   TreasuryRoom: 'Treasury, behind a locked door',
   StorageRoom: 'Storage room, behind a barricade',
   PitRoom: 'Pit room, behind a crystal door',
@@ -67,6 +68,8 @@ const SPOTS: Record<string, string> = {
   hidden_reward: 'in the hidden chamber',
   prize: 'in a tomb',
   gold_tombs: 'in the other tombs',
+  cracked_spyglass: 'hidden on the floor (Cracked Spyglass)',
+  into_darkness: 'extra torch from Into Darkness',
 }
 
 /** Tags that say nothing about where to look. */

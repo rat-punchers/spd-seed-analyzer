@@ -1,7 +1,8 @@
 //! Profile validation and first-generation state resolution.
 
 use super::{
-    ActiveTrinket, Challenge, ChallengeEffect, MapProfile, TrinketEventAction, TrinketKind,
+    ActiveTrinket, Challenge, ChallengeEffect, MapProfile, TrinketEventAction,
+    TrinketGenerationEffect, TrinketKind,
 };
 
 impl MapProfile {
@@ -49,29 +50,33 @@ impl MapProfile {
         held
     }
 
-    pub(crate) fn only_uses_mimic_tooth(&self) -> bool {
-        self.artifact_events.is_empty()
-            && self.trinket_events.iter().all(|event| {
-                matches!(
-                    event.action,
-                    TrinketEventAction::Acquired {
-                        trinket: TrinketKind::MimicTooth,
-                        ..
-                    } | TrinketEventAction::Transmuted {
-                        trinket: TrinketKind::MimicTooth
-                    } | TrinketEventAction::Upgraded
-                )
-            })
+    /// Whether any unmodeled player input can affect floor `depth` or an
+    /// earlier floor in this chronological profile.
+    pub(crate) fn has_unmodeled_generation_inputs_at(&self, depth: u32) -> bool {
+        self.challenges
+            .iter()
+            .any(|challenge| challenge.generation_effect() == ChallengeEffect::Unmodeled)
+            || self
+                .artifact_events
+                .iter()
+                .any(|event| event.before_depth <= depth)
+            || self
+                .trinket_events
+                .iter()
+                .take_while(|event| event.before_depth <= depth)
+                .any(|event| match event.action {
+                    TrinketEventAction::Acquired { trinket, .. }
+                    | TrinketEventAction::Transmuted { trinket } => {
+                        trinket.generation_effect() == TrinketGenerationEffect::Unmodeled
+                    }
+                    TrinketEventAction::Upgraded => false,
+                })
     }
 
     /// Inputs whose generation effects are intentionally deferred to later
     /// replay phases. Their public projection remains conservative meanwhile.
     pub(crate) fn has_unmodeled_generation_inputs(&self) -> bool {
-        !self.artifact_events.is_empty()
-            || self
-                .challenges
-                .iter()
-                .any(|challenge| challenge.generation_effect() == ChallengeEffect::Unmodeled)
+        self.has_unmodeled_generation_inputs_at(26)
     }
 
     pub(crate) fn validate(&self, first_effective_depth: u32) -> Result<(), ProfileError> {

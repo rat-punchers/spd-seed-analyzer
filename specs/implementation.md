@@ -102,7 +102,7 @@ localStorage. Mimic carried items are on the floor list and the map inspect
 panel: the converted heap item, the generated prize, and the Mimic Tooth
 extra when one is held. Ebony mimics (Mimic Tooth only) carry the prize,
 the tooth extra, and one more default item, each uncursed and at least +1.
-Crystal mimics keep the uncursed vault prize and lose it if they escape.
+Crystal mimics keep the uncursed vault prize and lose it if they escape. Animated statues carry their enchanted weapon on both the floor list and the map inspect panel; armored statues also carry and drop their inscribed armor.
 On floor 2 an ebony mimic's cell can depend on the unseeded entrance guide
 page, and is then left off the map. Java oracle fixtures cover Mimic Tooth
 +3 floors (`*-mimic-tooth-3-before-*.json`).
@@ -134,11 +134,13 @@ player-dependent outcomes as fixed (SEED-ANALYSIS, NO-CLAIM). The web report
 already shows the default profile through Variable samples and "May differ"
 labels.
 
-Default-profile floor lists pair blank room contracts with concrete Variable
-samples (RingRoom, Sacrifice, CrystalVault, labs, shops, …) so the UI can show
-the item instead of "?". Remaining blank stubs are branch-miss contracts
-(possible pool equipment, gold fallback, unused catalyst slot, SecretGarden)
-with no sample on this profile; the UI hides those.
+Active-profile floor lists pair blank room and queued-food contracts with
+concrete Variable samples (RingRoom, Sacrifice, CrystalVault, BlacksmithRoom,
+labs, shops, queued food, …) and publish ordinary floor-heap, MassGrave
+skeleton, Spyglass, and Into Darkness drops so the list matches the floor map
+instead of hiding items or leaving "?" stubs. Remaining blank stubs are
+branch-miss contracts (possible pool equipment, gold fallback, unused catalyst
+slot, SecretGarden) with no sample on this profile; the UI hides those.
 
 Next:
 
@@ -147,7 +149,7 @@ Next:
    replays ~45%. `patch::generate` (~17%) is mostly the parity-bound
    `next_float` fill draws. Measured but not adopted: talc allocator (no
    WASM gain), `+simd128` (~7% WASM, drops pre-16.4 Safari), sharing the
-   pre-trinket floor prefix across routes (~1–2 ms; routes split on
-   ghost-reward profiling and need trinket/RNG thread-local snapshots), and
+   pre-trinket floor prefix across routes (~1–2 ms; needs trinket/RNG
+   thread-local snapshots), and
    micro-changes that measured slower (compact free-space rects, hoisted
    maze RNG, reused `smooth` buffers).

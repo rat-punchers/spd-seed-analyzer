@@ -334,7 +334,10 @@ mechanisms would have to leak for run history to move them; two are closed.
 - **Per-category sub-decks** (pick the class) — closed for RING (§4), WAND (§9),
   and the WEP/MIS tiers: every runtime weapon site passes `useDefaults=true` or
   `useDecks=false` (`Statue.random(false)` from `DistortionTrap.java:125`,
-  `WndBlacksmith.java:478 generateRewards(false)`). Armor uses no deck at all
+  `WndBlacksmith.java:478 generateRewards(false)`, `TormentedSpirit.cleanse()`
+  calling `Generator.randomWeapon(true)` at `TormentedSpirit.java:63-68` after
+  an unseeded `Wraith.spawnAt` roll at `Wraith.java:144-150` from
+  `Heap.java:86-98` and `Dungeon.java:254`). Armor uses no deck at all
   (`randomArmor` picks a tier by `chances` and indexes `cat.classes` directly).
   SEED is deliberately deck-free at levelgen — `Generator.java:684-688`
   special-cases it to `randomUsingDefaults` precisely because grass, not

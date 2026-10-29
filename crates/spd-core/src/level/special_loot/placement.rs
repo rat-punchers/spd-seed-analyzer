@@ -39,31 +39,36 @@ pub(super) fn find_prize_item(
     if items_to_spawn.is_empty() {
         return None;
     }
-    match match_class {
+    let mut pulled = match match_class {
         None => {
             // prefer TrinketCatalyst
             if let Some(i) = items_to_spawn
                 .iter()
                 .position(|it| it.class_name == "TrinketCatalyst")
             {
-                return Some(items_to_spawn.remove(i));
+                items_to_spawn.remove(i)
+            } else {
+                let idx = Random::int_max(items_to_spawn.len() as i32) as usize;
+                items_to_spawn.remove(idx)
             }
-            let idx = Random::int_max(items_to_spawn.len() as i32) as usize;
-            Some(items_to_spawn.remove(idx))
         }
-        Some(class) => items_to_spawn
-            .iter()
-            .position(|it| it.class_name == class)
-            .map(|i| items_to_spawn.remove(i)),
-    }
+        Some(class) => {
+            let i = items_to_spawn
+                .iter()
+                .position(|it| it.class_name == class)?;
+            items_to_spawn.remove(i)
+        }
+    };
+    pulled.from_spawn_queue = true;
+    Some(pulled)
 }
 
 pub(super) fn find_prize_item_category(
     items_to_spawn: &mut Vec<GeneratedItem>,
     cat: ItemCategory,
 ) -> Option<GeneratedItem> {
-    items_to_spawn
-        .iter()
-        .position(|it| it.category == cat)
-        .map(|i| items_to_spawn.remove(i))
+    let i = items_to_spawn.iter().position(|it| it.category == cat)?;
+    let mut pulled = items_to_spawn.remove(i);
+    pulled.from_spawn_queue = true;
+    Some(pulled)
 }

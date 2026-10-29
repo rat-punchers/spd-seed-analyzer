@@ -259,12 +259,11 @@ mod tests {
                     break;
                 }
                 assert_eq!(
-                    displayed_tiles(before),
-                    displayed_tiles(after),
-                    "seed {seed} depth {}",
+                    serde_json::to_value(before).unwrap(),
+                    serde_json::to_value(after).unwrap(),
+                    "seed {seed} depth {} changed before trinket takes effect at {first}",
                     after.depth
                 );
-                assert_eq!(before.feeling, after.feeling);
             }
             checked += 1;
         }
@@ -293,5 +292,40 @@ mod tests {
                 .any(|(before, after)| displayed_tiles(before) != displayed_tiles(after))
         });
         assert!(changed, "Mossy Clump never changed a later floor layout");
+    }
+
+    #[test]
+    fn selection_floor_ghost_reward_stays_fixed_when_trinket_is_picked() {
+        let base_zwd = analyze_seed("CHL-XBM-ZWD", 4).unwrap();
+        assert_eq!(base_zwd.trinket_selection.selection_depth, 2);
+        assert_eq!(base_zwd.trinket_selection.first_effective_depth, 3);
+        let picked_zwd =
+            analyze_seed_with_trinket("CHL-XBM-ZWD", 4, Some(TrinketKind::ParchmentScrap)).unwrap();
+        assert_eq!(
+            serde_json::to_value(&base_zwd.floors[1]).unwrap(),
+            serde_json::to_value(&picked_zwd.floors[1]).unwrap(),
+        );
+
+        let base_zdd = analyze_seed("CHL-XBM-ZDD", 4).unwrap();
+        assert_eq!(base_zdd.trinket_selection.selection_depth, 3);
+        assert_eq!(base_zdd.trinket_selection.first_effective_depth, 4);
+        let ghost_groups: Vec<_> = base_zdd.floors[1]
+            .items
+            .iter()
+            .filter(|group| group.source.as_deref() == Some("Ghost.Quest"))
+            .collect();
+        assert_eq!(ghost_groups.len(), 2);
+        assert!(ghost_groups
+            .iter()
+            .flat_map(|group| &group.variants)
+            .all(|variant| variant.spawn_conditions.is_empty()));
+        let picked_zdd =
+            analyze_seed_with_trinket("CHL-XBM-ZDD", 4, Some(TrinketKind::TrapMechanism)).unwrap();
+        for depth_idx in 0..3 {
+            assert_eq!(
+                serde_json::to_value(&base_zdd.floors[depth_idx]).unwrap(),
+                serde_json::to_value(&picked_zdd.floors[depth_idx]).unwrap(),
+            );
+        }
     }
 }

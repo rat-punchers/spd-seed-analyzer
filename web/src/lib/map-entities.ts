@@ -148,7 +148,7 @@ function drawMob(
   scale: number,
   seconds: number | null
 ) {
-  const spriteDef = mobSprite(mob.mob)
+  const spriteDef = mobSprite(mob.mob, mob.items)
   const image = spriteDef && assets.mobs[spriteDef.sheet]
   if (!spriteDef || !image) return false
   const faint = mob.opacity != null && mob.opacity < 1

@@ -117,7 +117,9 @@ function EntrySection({
       return (
         <div className="flex flex-col gap-2">
           <PictureRow
-            picture={<MobPortrait mob={entry.mob.mob} label={title} />}
+            picture={
+              <MobPortrait mob={entry.mob.mob} items={drops} label={title} />
+            }
           >
             <ObjectSection
               title={title}

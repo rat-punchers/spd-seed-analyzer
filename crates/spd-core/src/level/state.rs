@@ -14,8 +14,8 @@ use super::Feeling;
 
 #[path = "state/forced_queue.rs"]
 mod forced_queue;
+use forced_queue::locate_in_rooms;
 use forced_queue::public_entries as forced_public_entries;
-use forced_queue::{locate_in_rooms, relocating_room};
 
 #[path = "state/conditions.rs"]
 mod conditions;
@@ -29,7 +29,6 @@ mod encounters;
 
 #[path = "state/variable.rs"]
 mod variable;
-use variable::item_entry as variable_item_entry;
 
 #[path = "state/sources.rs"]
 mod sources;
@@ -133,7 +132,7 @@ fn is_unpublished_main_loot(item: &GeneratedItem) -> bool {
     item.source
         .as_deref()
         .and_then(|source| source.rsplit(':').next())
-        .is_some_and(|origin| matches!(origin, "mimic" | "golden_mimic"))
+        .is_some_and(|origin| matches!(origin, "mimic" | "golden_mimic" | "ebony_mimic"))
 }
 
 fn is_exact_floor_one_room_prize(
@@ -275,34 +274,7 @@ impl LevelState {
         first_effective_trinket_depth: Option<u32>,
     ) -> FloorReport {
         let mut items = forced_public_entries(self.depth, &self.initial_forced_items);
-        let variable_items: Vec<_> = if self.expose_variable_items {
-            self.placed_items
-                .iter()
-                // A room prize pulled from the spawn queue is published as
-                // its guaranteed floor spawn, located at the room.
-                .filter(|item| relocating_room(item).is_none())
-                .filter_map(variable_item_entry)
-                .filter(|item| {
-                    // Compact/search stay selective; also publish room/shop
-                    // samples that clear blank "?" contracts, and every
-                    // non-gold item a mimic carries.
-                    (crate::report::is_variable_highlight(item)
-                        || is_floor_uncover_sample(item)
-                        || variable::is_mimic_carried_source(item.source.as_deref()))
-                        && (self.depth > 1
-                            || !matches!(
-                                item.source.as_deref(),
-                                Some(
-                                    "PoolRoom:equipment"
-                                        | "SuspiciousChestRoom:gold"
-                                        | "SuspiciousChestRoom:mimic_reward"
-                                )
-                            ))
-                })
-                .collect()
-        } else {
-            Vec::new()
-        };
+        let variable_items = variable::collect_samples(self);
         let exact_floor_one_room_prize_indices: Vec<_> = if self.depth == 1
             && !self.runtime_sensitive_layout
         {
@@ -322,10 +294,15 @@ impl LevelState {
         // the private queue-consumption lifecycle.
         for &index in &exact_floor_one_room_prize_indices {
             let prize = &self.placed_items[index];
-            items.retain(|entry| {
-                !(entry.source.as_deref() == Some("guaranteed floor spawn")
-                    && entry.class_name() == Some(prize.class_name.as_str()))
-            });
+            if !prize.from_spawn_queue {
+                continue;
+            }
+            if let Some(pos) = items.iter().position(|entry| {
+                entry.source.as_deref() == Some("guaranteed floor spawn")
+                    && entry.class_name() == Some(prize.class_name.as_str())
+            }) {
+                items.remove(pos);
+            }
         }
         // Deeper floors locate it at its default-profile room, like the
         // assumed map and the variable room samples.
@@ -794,17 +771,7 @@ impl LevelState {
             }
         }
         // Default-profile samples join contracts in group_item_entries.
-        for variable in &variable_items {
-            let variable_room = room_family(variable.source.as_deref());
-            let already_projected = items.iter().any(|item| {
-                item.item == variable.item
-                    && item.item.is_some()
-                    && room_family(item.source.as_deref()) == variable_room
-            });
-            if !already_projected {
-                items.push(variable.clone());
-            }
-        }
+        variable::append_unprojected_samples(&mut items, &variable_items);
         let mut items = merge_identical_items(items);
         items.retain(|entry| !entry.item.is_some_and(is_non_item));
         let public_map = || {
@@ -894,58 +861,6 @@ fn is_non_item(id: spd_objects::ItemId) -> bool {
             | ItemId::DocumentPage
             | ItemId::TornPage
     )
-}
-
-fn room_family(source: Option<&str>) -> Option<&str> {
-    source.map(|source| source.split(':').next().unwrap_or(source))
-}
-
-/// Default-profile room/shop samples that clear blank constrained stubs.
-/// Quest samples stay on the highlight path; BlacksmithRoom stays constrained.
-fn is_floor_uncover_sample(item: &ItemEntry) -> bool {
-    let Some(source) = item.source.as_deref() else {
-        return false;
-    };
-    if source.contains("ShopRoom") {
-        return item.item.is_some();
-    }
-    let room = source.split(':').next().unwrap_or(source);
-    matches!(
-        room,
-        "RingRoom"
-            | "ArmoryRoom"
-            | "StudyRoom"
-            | "RitualRoom"
-            | "CryptRoom"
-            | "StatueRoom"
-            | "SacrificeRoom"
-            | "CrystalVaultRoom"
-            | "CrystalChoiceRoom"
-            | "CrystalPathRoom"
-            | "LaboratoryRoom"
-            | "LibraryRoom"
-            | "TreasuryRoom"
-            | "StorageRoom"
-            | "RunestoneRoom"
-            | "MagicalFireRoom"
-            | "ToxicGasRoom"
-            | "PitRoom"
-            | "SentryRoom"
-            | "TrapsRoom"
-            | "PoolRoom"
-            | "SuspiciousChestRoom"
-            | "GrassyGraveRoom"
-            | "SecretLibraryRoom"
-            | "SecretRunestoneRoom"
-            | "SecretArtilleryRoom"
-            | "SecretLaboratoryRoom"
-            | "SecretLarderRoom"
-            | "SecretHoardRoom"
-            | "SecretGardenRoom"
-            | "SecretMazeRoom"
-            | "SecretSummoningRoom"
-            | "SecretChestChasmRoom"
-    ) && item.item.is_some()
 }
 
 #[cfg(test)]

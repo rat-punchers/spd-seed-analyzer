@@ -12,7 +12,7 @@ pub(super) use consumable::{
 #[cfg(test)]
 pub(super) use equip::pool_prize;
 pub(super) use equip::{
-    armory_prizes_on_map, bomb_random, crypt_prize, pool_prize_on_map, statue_weapon,
+    armory_prizes_on_map, bomb_random, crypt_prize, pool_prize_on_map, statue_prizes,
 };
 pub(super) use laboratory::paint as paint_laboratory;
 

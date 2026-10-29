@@ -255,18 +255,17 @@ impl Drop for ChildGeneratorGuard {
     }
 }
 
-pub fn statue_weapon(
+pub fn statue_prizes(
     dungeon: &mut DungeonState,
     room: &Room,
     map: &mut TerrainMap,
     entrance: Point,
     items_to_spawn: &mut Vec<GeneratedItem>,
-) -> PlacedLoot {
+) -> Vec<PlacedLoot> {
     // StatueRoom.java:46 — IronKey pushed before Statue.random() (zero-RNG append)
     items_to_spawn.push(GeneratedItem::new("IronKey", ItemCategory::Other));
     // StatueRoom.paint selects its mob position from Room.center() before
-    // Statue.random(). Odd room spans therefore consume the pinned Int(2)
-    // center jitter even though this analyzer only exports the statue weapon.
+    // Statue.random(), consuming the pinned Int(2) center jitter on odd spans.
     let mut center = room.as_rect().center_room();
     if entrance.x == room.left {
         center.x = room.right - 2;
@@ -281,12 +280,13 @@ pub fn statue_weapon(
         .point_to_cell(center.x, center.y)
         .expect("placed StatueRoom center is inside map bounds");
     map.mob_occupied[cell] = true;
-    map.place_mob(cell, "Statue");
     // Statue.random: Rat Skull's rare-alt chance is half-effective above base.
     // The float stays on the level-generation stream. Weapon, enchant, and any
     // armored armor+glyph rolls run on a child seeded by one parent long.
     // Deck counters still move: generator deck state is global.
     let armored = Random::float() < crate::level::trinkets::exotic_chance(0.1);
+    map.place_mob(cell, if armored { "ArmoredStatue" } else { "Statue" });
+
     Random::push_generator_seeded(Random::long());
     let _child = ChildGeneratorGuard;
     let mut weapon = dungeon
@@ -294,29 +294,37 @@ pub fn statue_weapon(
         .random_category(Category::Weapon, dungeon.depth);
     weapon.cursed = false;
     weapon.enchantment = Some(enchants::random_weapon_enchant(None).to_string());
-    // ArmoredStatue.createWeapon: armor is not a guaranteed drop. Its tier and
-    // glyph rolls stay on the child stream so later level-generation callbacks
-    // see the same parent state for both statue types.
+    weapon.source = Some("StatueRoom".into());
+    // Record carried loot while `_child` is active so a tainted weapon deck
+    // marks `cell` uncertain without tainting the parent floor stream.
+    map.record_mob_loot(cell, weapon.clone());
+    let mut out = vec![PlacedLoot {
+        item: weapon,
+        heap_type: "statue",
+    }];
+    // ArmoredStatue.die drops its inscribed armor alongside super.die's weapon.
     if armored {
         let mut armor = dungeon
             .generator
             .random_armor(dungeon.depth / 5, dungeon.depth);
         armor.cursed = false;
         armor.enchantment = Some(enchants::random_armor_glyph(None).to_string());
+        armor.source = Some("StatueRoom".into());
+        map.record_mob_loot(cell, armor.clone());
+        out.push(PlacedLoot {
+            item: armor,
+            heap_type: "statue",
+        });
     }
-    weapon.source = Some("StatueRoom".into());
-    PlacedLoot {
-        item: weapon,
-        heap_type: "statue",
-    }
+    out
 }
 
 #[cfg(test)]
 mod statue_stream_tests {
-    use super::statue_weapon;
+    use super::statue_prizes;
     use crate::geom::Point;
-    use crate::items::model::GeneratedItem;
-    use crate::level::terrain::paint_minimal;
+    use crate::items::model::{GeneratedItem, ItemCategory};
+    use crate::level::terrain::{paint_minimal, TerrainMap};
     use crate::level::trinkets::{self, set_held};
     use crate::random::Random;
     use crate::rooms::room::Room;
@@ -333,7 +341,7 @@ mod statue_stream_tests {
         room
     }
 
-    fn parent_tail(seed: i64, rat_skull: bool) -> (Vec<i32>, GeneratedItem) {
+    fn parent_tail(seed: i64, rat_skull: bool) -> (Vec<i32>, Vec<GeneratedItem>, TerrainMap) {
         trinkets::reset(1);
         set_held(rat_skull.then_some(ActiveTrinket {
             trinket: TrinketKind::RatSkull,
@@ -345,7 +353,7 @@ mod statue_stream_tests {
         Random::push_generator_seeded(seed);
         let room = even_statue_room();
         let mut map = paint_minimal(std::slice::from_ref(&room)).expect("map");
-        let loot = statue_weapon(
+        let loot = statue_prizes(
             &mut dungeon,
             &room,
             &mut map,
@@ -355,7 +363,11 @@ mod statue_stream_tests {
         let tail = Random::peek_ints(4);
         Random::pop_generator();
         set_held(None);
-        (tail, loot.item)
+        (
+            tail,
+            loot.into_iter().map(|placed| placed.item).collect(),
+            map,
+        )
     }
 
     #[test]
@@ -378,10 +390,29 @@ mod statue_stream_tests {
         let manual = Random::peek_ints(4);
         Random::pop_generator();
 
-        let (plain_tail, plain_weapon) = parent_tail(seed, false);
-        let (armored_tail, armored_weapon) = parent_tail(seed, true);
+        let (plain_tail, plain_items, plain_map) = parent_tail(seed, false);
+        let (armored_tail, armored_items, armored_map) = parent_tail(seed, true);
         assert_eq!(plain_tail, manual, "plain branch");
         assert_eq!(armored_tail, manual, "rat skull armored branch");
-        assert_eq!(plain_weapon, armored_weapon);
+        assert_eq!(plain_items.len(), 1);
+        assert_eq!(armored_items.len(), 2);
+        assert_eq!(plain_items[0], armored_items[0]);
+        assert_eq!(armored_items[1].category, ItemCategory::Armor);
+        assert!(!armored_items[1].cursed);
+        assert!(armored_items[1].enchantment.is_some());
+
+        let plain_cell = plain_map
+            .known_mobs
+            .iter()
+            .position(|mob| *mob == Some("Statue"))
+            .expect("plain Statue mob");
+        assert_eq!(plain_map.mob_loot[plain_cell], plain_items);
+
+        let armored_cell = armored_map
+            .known_mobs
+            .iter()
+            .position(|mob| *mob == Some("ArmoredStatue"))
+            .expect("ArmoredStatue mob");
+        assert_eq!(armored_map.mob_loot[armored_cell], armored_items);
     }
 }

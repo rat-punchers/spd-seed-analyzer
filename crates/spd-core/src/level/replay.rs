@@ -20,10 +20,11 @@ pub fn analyze_layouts_with_profile(
     for depth in 1..=max {
         dungeon.depth = depth;
         dungeon.branch = 0;
-        trinkets::set_held(profile.held_at(depth as u32));
+        let depth_u32 = depth as u32;
+        trinkets::set_held(profile.held_at(depth_u32));
         let level = create_level_internal(
             dungeon,
-            !profile.has_unmodeled_generation_inputs(),
+            !profile.has_unmodeled_generation_inputs_at(depth_u32),
             LevelOutput::LAYOUT,
         );
         let mut report =
@@ -173,8 +174,7 @@ pub(crate) fn replay_default_profile_states(
 ) -> Vec<LevelState> {
     let profile = MapProfile::default();
     dungeon.challenges = profile.challenge_mask();
-    dungeon.ghost_rewards_profiled =
-        !profile.has_unmodeled_generation_inputs() && profile.only_uses_mimic_tooth();
+    dungeon.ghost_rewards_profiled = !profile.has_unmodeled_generation_inputs();
     dungeon.expose_variable_items = true;
     trinkets::reset(dungeon.seed);
     let output = if maps {
@@ -207,11 +207,7 @@ fn replay_floors(
         "side branches read the current dungeon depth and cannot be deferred"
     );
     dungeon.challenges = profile.map_or(0, MapProfile::challenge_mask);
-    dungeon.ghost_rewards_profiled = profile.is_some_and(|profile| {
-        !profile.has_unmodeled_generation_inputs() && profile.only_uses_mimic_tooth()
-    });
     trinkets::reset(dungeon.seed);
-    let configured = profile.is_some_and(|profile| !profile.has_unmodeled_generation_inputs());
     let max = max_floors.clamp(1, 26) as i32;
     let mut first_effective = first_effective_trinket_depth;
     let mut scan = TrinketScan::default();
@@ -221,9 +217,13 @@ fn replay_floors(
         if depth > max && first_effective.is_some() {
             break;
         }
+        let depth_u32 = depth as u32;
+        let configured =
+            profile.is_some_and(|profile| !profile.has_unmodeled_generation_inputs_at(depth_u32));
         dungeon.depth = depth;
         dungeon.branch = 0;
-        trinkets::set_held(profile.and_then(|profile| profile.held_at(depth as u32)));
+        dungeon.ghost_rewards_profiled = configured;
+        trinkets::set_held(profile.and_then(|profile| profile.held_at(depth_u32)));
         let level = create_level_internal(dungeon, configured, output);
         if first_effective.is_none() {
             scan.observe(&level);
@@ -236,10 +236,13 @@ fn replay_floors(
             continue;
         };
         for level in pending.drain(..) {
+            let level_configured = profile.is_some_and(|profile| {
+                !profile.has_unmodeled_generation_inputs_at(level.depth as u32)
+            });
             let mut report =
-                level.to_floor_report_with_trinket_availability(configured, first_effective);
+                level.to_floor_report_with_trinket_availability(level_configured, first_effective);
             if output.maps {
-                attach_side_branches(dungeon, configured, &mut report);
+                attach_side_branches(dungeon, level_configured, &mut report);
             } else {
                 // Boss floors still build their fixed layout to decide `build_ok`.
                 report.map = None;

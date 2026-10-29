@@ -1,4 +1,5 @@
-import { type MobId, mobClassName } from '@/generated/game-ids'
+import { itemClassName, type MobId, mobClassName } from '@/generated/game-ids'
+import type { MapHeapItem } from '@/lib/spd-wasm'
 
 /** Idle animation of a pinned v4.0.2 `*Sprite` class on its `TextureFilm`. */
 export type MobSprite = {
@@ -151,7 +152,8 @@ const MOB_SPRITES: Record<string, MobSprite> = {
   RipperDemon: sprite('ripper', 15, 14, 4, [1, 0, 1, 2]),
   DemonSpawner: sprite('spawner', 16, 16, 8, [...Array(16).keys()]),
   Statue: sprite('statue', 12, 15, 2, STAND),
-  ArmoredStatue: sprite('statue', 12, 15, 2, STAND),
+  // `ArmoredStatue.sprite()` defaults to tier 3 when armor is absent.
+  ArmoredStatue: sprite('statue', 12, 15, 2, STAND, 43),
   Mimic: mimic(0),
   GoldenMimic: mimic(16),
   CrystalMimic: mimic(32),
@@ -215,8 +217,28 @@ const MOB_SPRITES: Record<string, MobSprite> = {
   VaultTokenDoor: sprite('vault_tokens_door', 16, 16, 0, [0]),
 }
 
-export function mobSprite(mob: MobId): MobSprite | undefined {
-  return MOB_SPRITES[mobClassName(mob)]
+const ARMORED_STATUE_OFFSETS: Record<string, number> = {
+  ClothArmor: 21,
+  LeatherArmor: 32,
+  MailArmor: 43,
+  ScaleArmor: 54,
+  PlateArmor: 65,
+}
+
+export function mobSprite(
+  mob: MobId,
+  items?: readonly MapHeapItem[]
+): MobSprite | undefined {
+  const cls = mobClassName(mob)
+  if (cls === 'ArmoredStatue' && items?.length) {
+    for (const entry of items) {
+      const offset = ARMORED_STATUE_OFFSETS[itemClassName(entry.item)]
+      if (offset != null) {
+        return sprite('statue', 12, 15, 2, STAND, offset)
+      }
+    }
+  }
+  return MOB_SPRITES[cls]
 }
 
 export function mobSheetUrl(sheet: string): string {

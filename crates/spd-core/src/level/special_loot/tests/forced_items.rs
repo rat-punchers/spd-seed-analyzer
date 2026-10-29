@@ -4,7 +4,7 @@ use super::super::quest_rooms::mass_grave_prizes;
 use super::super::secret_rooms::{secret_laboratory, secret_larder, secret_runestone};
 use super::super::special_rooms::{
     armory_prizes_on_map, crypt_prize, library_prizes, paint_laboratory, pool_prize,
-    runestone_prizes, runestone_prizes_on_map, statue_weapon, treasury_prizes_on_map,
+    runestone_prizes, runestone_prizes_on_map, statue_prizes, treasury_prizes_on_map,
 };
 use super::test_room;
 use crate::geom::Point;
@@ -224,7 +224,7 @@ fn statue_room_consumes_center_jitter_before_weapon_and_pushes_iron_key() {
     let mut spawn = Vec::new();
     let mut map = paint_minimal(std::slice::from_ref(&room)).expect("map");
     let entrance = Point::new(room.left, room.top + 2);
-    let loot = statue_weapon(&mut d, &room, &mut map, entrance, &mut spawn);
+    let loot = &statue_prizes(&mut d, &room, &mut map, entrance, &mut spawn)[0];
     let after_statue = Random::peek_ints(3);
     Random::pop_generator();
     Random::push_generator_seeded(106);
@@ -251,7 +251,7 @@ fn statue_room_consumes_center_jitter_before_weapon_and_pushes_iron_key() {
         .known_mobs
         .iter()
         .enumerate()
-        .filter_map(|(cell, mob)| (*mob == Some("Statue")).then_some(cell))
+        .filter_map(|(cell, mob)| matches!(*mob, Some("Statue" | "ArmoredStatue")).then_some(cell))
         .collect();
     assert_eq!(statues.len(), 1);
     assert!(map.mob_occupied[statues[0]]);

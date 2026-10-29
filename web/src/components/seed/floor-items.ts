@@ -45,13 +45,6 @@ function itemSection(
 }
 
 export function visibleItemGroups(items: ItemGroup[]): VisibleItemGroup[] {
-  const exactItems = new Set(
-    items.flatMap((group) =>
-      group.variants
-        .filter((item) => item.prediction === 'exact')
-        .map((item) => itemDisplayKey(item, group.source))
-    )
-  )
   return items
     .map((group): VisibleItemGroup => {
       // Room contracts ship constrained + variable siblings for one spawn.
@@ -65,15 +58,9 @@ export function visibleItemGroups(items: ItemGroup[]): VisibleItemGroup[] {
       return {
         ...group,
         contract: hasVariable ? contract : undefined,
-        variants: group.variants.filter((item) => {
-          if (item.prediction === 'constrained' && hasVariable) {
-            return false
-          }
-          if (item.prediction === 'variable') {
-            return !exactItems.has(itemDisplayKey(item, group.source))
-          }
-          return true
-        }),
+        variants: group.variants.filter(
+          (item) => !(item.prediction === 'constrained' && hasVariable)
+        ),
       }
     })
     .map((group) => ({
@@ -91,10 +78,6 @@ export function visibleItemGroups(items: ItemGroup[]): VisibleItemGroup[] {
             ),
     }))
     .filter((group) => group.variants.length > 0)
-}
-
-function itemDisplayKey(item: ItemVariant, source?: string | null) {
-  return JSON.stringify([item.item, item.level, source])
 }
 
 export function partitionFloorItems(items: VisibleItemGroup[]) {

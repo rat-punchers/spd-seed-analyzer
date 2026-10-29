@@ -1,5 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import { visibleItemGroups } from '@/components/seed/floor-items'
+import {
+  floorItemGroups,
+  visibleItemGroups,
+} from '@/components/seed/floor-items'
 import { summarizeItemContract } from '@/lib/item-contract'
 import type { ItemGroup } from '@/lib/spd-wasm'
 
@@ -90,5 +93,76 @@ describe('visibleItemGroups', () => {
         prediction: 'exact',
       }).facts
     ).toEqual(['Quantity 6–10', 'Uncursed'])
+  })
+
+  test('surfaces queued food samples and keeps distinct exact plus variable potions', () => {
+    const groups = floorItemGroups({
+      depth: 4,
+      rooms: [],
+      items: [
+        {
+          source: 'guaranteed floor spawn',
+          variants: [
+            {
+              label: 'food',
+              quantity: 1,
+              category: 'food',
+              prediction: 'constrained',
+            },
+            {
+              quantity: 1,
+              item: 132,
+              category: 'food',
+              level: 0,
+              cursed: false,
+              prediction: 'variable',
+            },
+          ],
+        },
+        {
+          source: 'StorageRoom',
+          variants: [
+            {
+              quantity: 1,
+              item: 151,
+              category: 'potion',
+              level: 0,
+              cursed: false,
+              prediction: 'exact',
+            },
+          ],
+        },
+        {
+          source: 'StorageRoom',
+          variants: [
+            {
+              quantity: 1,
+              item: 151,
+              category: 'potion',
+              level: 0,
+              cursed: false,
+              prediction: 'variable',
+            },
+          ],
+        },
+        {
+          source: 'heap',
+          variants: [
+            {
+              quantity: 1,
+              item: 211,
+              category: 'scroll',
+              level: 0,
+              cursed: false,
+              prediction: 'variable',
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(
+      groups.other.flatMap((group) => group.variants.map((item) => item.item))
+    ).toEqual([132, 211, 151, 151])
   })
 })

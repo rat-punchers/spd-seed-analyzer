@@ -168,8 +168,16 @@ export function StairPortrait({
   )
 }
 
-export function MobPortrait({ mob, label }: { mob: MobId; label: string }) {
-  const def = mobSprite(mob)
+export function MobPortrait({
+  mob,
+  items,
+  label,
+}: {
+  mob: MobId
+  items?: readonly MapHeapItem[]
+  label: string
+}) {
+  const def = mobSprite(mob, items)
   const sheet = useLoadedSheet(def ? mobSheetUrl(def.sheet) : null)
   if (!def) return null
   if (!sheet) {

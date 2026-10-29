@@ -246,13 +246,7 @@ fn paint_special(
                 .find_map(|&other| doors.get(ri, other))
                 .map(|door| crate::geom::Point::new(door.x, door.y))
                 .expect("placed StatueRoom has an entrance");
-            vec![special_rooms::statue_weapon(
-                dungeon,
-                room,
-                map,
-                entrance,
-                items_to_spawn,
-            )]
+            special_rooms::statue_prizes(dungeon, room, map, entrance, items_to_spawn)
         }
         "SecretLibraryRoom" => secret_rooms::secret_library(room, map),
         "SecretRunestoneRoom" => secret_rooms::secret_runestone(dungeon, room, map, items_to_spawn),
