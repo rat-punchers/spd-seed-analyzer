@@ -20,6 +20,7 @@ struct CityPaintCheckpoint {
 
 #[test]
 fn aaa_floor_nineteen_matches_through_tile_variance() {
+    let _journal = crate::fresh_journal();
     let name = OsStr::new("aaa-aaa-aaa-final-heaps-floor-19.json");
     let path = fixture_paths()
         .into_iter()
@@ -243,6 +244,7 @@ fn aaa_floor_nineteen_matches_through_tile_variance() {
 
 #[test]
 fn gfx_floor_nineteen_matches_java_pre_mob_boundary() {
+    let _journal = crate::fresh_journal();
     let name = OsStr::new("gfx-pzh-dch-final-heaps-floor-19.json");
     let path = fixture_paths()
         .into_iter()
@@ -269,6 +271,7 @@ fn gfx_floor_nineteen_matches_java_pre_mob_boundary() {
 
 #[test]
 fn gfx_floor_nineteen_city_room_paint_trace_matches_oracle() {
+    let _journal = crate::fresh_journal();
     let trace_path = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../tools/java-oracle/fixtures/traces/gfx-pzh-dch-floor-19-city-paint.json");
     let trace: CityPaintTrace = serde_json::from_str(

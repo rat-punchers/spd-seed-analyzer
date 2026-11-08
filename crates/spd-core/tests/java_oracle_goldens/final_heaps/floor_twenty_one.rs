@@ -7,6 +7,7 @@ use spd_core::rooms::init_rooms::BuilderKind;
 
 #[test]
 fn gfx_floor_twenty_one_halls_paint_trace_matches_loop_builder_history() {
+    let _journal = crate::fresh_journal();
     assert_halls_paint_trace(
         "GFX-PZH-DCH",
         "gfx-pzh-dch-floor-21-halls-paint.json",
@@ -19,6 +20,7 @@ fn gfx_floor_twenty_one_halls_paint_trace_matches_loop_builder_history() {
 
 #[test]
 fn afu_floor_twenty_one_halls_paint_trace_matches_retry_history() {
+    let _journal = crate::fresh_journal();
     assert_halls_paint_trace(
         "AAA-AAA-AFU",
         "aaa-aaa-afu-floor-21-halls-paint.json",
@@ -31,6 +33,7 @@ fn afu_floor_twenty_one_halls_paint_trace_matches_retry_history() {
 
 #[test]
 fn aaa_floor_twenty_one_pins_first_generation_divergence_fix() {
+    let _journal = crate::fresh_journal();
     let name = OsStr::new("aaa-aaa-aaa-final-heaps-floor-21.json");
     let path = fixture_paths()
         .into_iter()

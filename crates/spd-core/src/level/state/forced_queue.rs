@@ -192,11 +192,13 @@ pub(super) fn relocating_room(item: &GeneratedItem) -> Option<&str> {
 }
 
 /// Publish a relocated guaranteed spawn at its room so the floor list keeps
-/// the item's location.
+/// the item's location. Returns the relocated non-food entries: unlike food,
+/// they have no variable sample of their own.
 pub(super) fn locate_in_rooms<'a>(
     entries: &mut [ItemEntry],
     prizes: impl IntoIterator<Item = &'a GeneratedItem>,
-) {
+) -> Vec<ItemEntry> {
+    let mut relocated = Vec::new();
     for prize in prizes {
         let Some(room) = relocating_room(prize) else {
             continue;
@@ -210,6 +212,10 @@ pub(super) fn locate_in_rooms<'a>(
         });
         if let Some(entry) = entry {
             entry.source = Some(room.into());
+            if prize.category != ItemCategory::Food {
+                relocated.push(entry.clone());
+            }
         }
     }
+    relocated
 }

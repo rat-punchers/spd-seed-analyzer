@@ -4,6 +4,7 @@ use std::ffi::OsStr;
 
 #[test]
 fn aaa_floor_sixteen_matches_room_classes_and_normalized_bounds() {
+    let _journal = crate::fresh_journal();
     assert_floor_matches_oracle("aaa-aaa-aaa-final-heaps-floor-16.json");
 }
 
@@ -13,6 +14,7 @@ fn aaa_floor_sixteen_matches_room_classes_and_normalized_bounds() {
 /// Generator decks. Floors 12 and 14 also cover a Suspicious Chest prize chest.
 #[test]
 fn fvx_caves_and_city_floors_match_java_final_state() {
+    let _journal = crate::fresh_journal();
     for depth in [12, 13, 14, 16] {
         assert_floor_matches_oracle(&format!("fvx-ytn-slc-final-heaps-floor-{depth}.json"));
     }
@@ -131,6 +133,7 @@ struct CityShopCheckpoint {
 /// tie-break, which would shift the whole shop stock and every later floor.
 #[test]
 fn afu_floor_sixteen_loop_builder_shop_matches_oracle() {
+    let _journal = crate::fresh_journal();
     let actual =
         assert_loop_builder_shop_trace("AAA-AAA-AFU", "aaa-aaa-afu-floor-16-city-paint.json");
 
@@ -154,6 +157,7 @@ fn afu_floor_sixteen_loop_builder_shop_matches_oracle() {
 /// accidentally fitting only the original AFU placement.
 #[test]
 fn gfx_floor_sixteen_loop_builder_shop_matches_oracle() {
+    let _journal = crate::fresh_journal();
     assert_loop_builder_shop_trace("GFX-PZH-DCH", "gfx-pzh-dch-floor-16-city-paint.json");
 }
 

@@ -67,14 +67,17 @@ pub fn analyze_seed_with_trinket(
 }
 
 /// Analyze a seed for a run with `challenges` enabled (snake_case names, e.g.
-/// `forbidden_runes`) and an optional Catalyst trinket class name. An empty
-/// list matches `analyze_seed_with_trinket`.
+/// `forbidden_runes`) and an optional Catalyst trinket class name.
+/// `lore_complete: false` replays a fresh journal, whose guide and alchemy
+/// pages spawn. An empty list with a complete journal matches
+/// `analyze_seed_with_trinket`.
 #[wasm_bindgen]
 pub fn analyze_seed_for_run(
     input: &str,
     floors: u32,
     trinket: Option<String>,
     challenges: JsValue,
+    lore_complete: bool,
 ) -> Result<JsValue, JsValue> {
     let trinket = trinket
         .map(|class_name| {
@@ -84,7 +87,8 @@ pub fn analyze_seed_for_run(
         .transpose()?;
     let challenges: Vec<Challenge> = serde_wasm_bindgen::from_value(challenges)
         .map_err(|e| JsValue::from_str(&format!("invalid challenges: {e}")))?;
-    let report = core_analyze_for_run(input, floors, trinket, &challenges).map_err(analyze_err)?;
+    let report = core_analyze_for_run(input, floors, trinket, &challenges, lore_complete)
+        .map_err(analyze_err)?;
     json_value(&report)
 }
 

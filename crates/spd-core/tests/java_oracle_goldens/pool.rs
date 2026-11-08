@@ -2,6 +2,7 @@ use super::*;
 
 #[test]
 fn pool_room_lifecycle_matches_oracle() {
+    let _journal = crate::fresh_journal();
     let fixture = read_fixture(
         &Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../../tools/java-oracle/fixtures/aaa-aaa-aaa-final-heaps-floor-1.json"),

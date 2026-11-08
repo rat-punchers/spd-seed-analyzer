@@ -45,6 +45,7 @@ fn assert_secret_well_terrain(fixture_name: &str) {
 
 #[test]
 fn secret_well_rooms_match_oracle_terrain() {
+    let _journal = crate::fresh_journal();
     assert_secret_well_terrain("gfx-pzh-dch-final-heaps-floor-17.json");
     assert_secret_well_terrain("aaa-aaa-aaa-final-heaps-floor-23.json");
 }

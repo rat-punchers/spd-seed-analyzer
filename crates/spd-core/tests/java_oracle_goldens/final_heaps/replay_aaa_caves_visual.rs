@@ -4,6 +4,7 @@ use std::ffi::OsStr;
 
 #[test]
 fn aaa_caves_replay_matches_complete_pre_items_visual_facts() {
+    let _journal = crate::fresh_journal();
     let fixtures: Vec<_> = [11, 12, 13, 14]
         .into_iter()
         .map(fixture_for_depth)

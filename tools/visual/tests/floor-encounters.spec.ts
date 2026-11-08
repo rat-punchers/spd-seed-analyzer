@@ -133,6 +133,59 @@ test('floor lists include map drops and trinket picks only affect later floors',
   expect(browserErrors).toEqual([])
 })
 
+test('lore pages appear on maps only when the checkbox is on', async ({
+  page,
+}) => {
+  const browserErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error') browserErrors.push(message.text())
+  })
+  page.on('pageerror', (error) => browserErrors.push(error.message))
+
+  await openFloorOne(page, 'AAA-AAA-AAJ')
+  const header = page.locator('[data-run-header]')
+  const lore = header.locator('[data-lore-picker]')
+  const checkbox = lore.getByRole('checkbox', {
+    name: 'Show lore pages on maps',
+  })
+  await expect(checkbox).not.toBeChecked()
+  const sections = header.locator('section')
+  await expect(sections.nth(0)).toHaveAttribute('data-lore-picker')
+  await expect(sections.nth(1)).toHaveAttribute('data-challenge-picker')
+  await expect(lore).toContainText('completed journal')
+
+  const floor2 = page.locator('section[data-floor-depth="2"]')
+  const inspect = page.locator('[data-slot="map-inspect"]')
+  // Fresh-journal guide page cell (2, 9); the 44x35 viewport starts at x = 1.
+  const pageCell = [1.5 / 44, 9.5 / 35] as const
+  await floor2.getByRole('button', { name: 'Expand floor 2 map' }).click()
+  await clickMapFraction(page, ...pageCell)
+  await expect(page.getByText(/torn guidebook page/i)).toHaveCount(0)
+  await page.getByRole('button', { name: 'Close' }).click()
+
+  await checkbox.click()
+  await expect(lore).toContainText('new journal', { timeout: 60_000 })
+  await expect(checkbox).toBeChecked()
+  await expect(checkbox).toBeEnabled()
+
+  await floor2.getByRole('button', { name: 'Expand floor 2 map' }).click()
+  await clickMapFraction(page, ...pageCell)
+  await expect(inspect).toContainText(/torn guidebook page/i)
+  await page.getByRole('button', { name: 'Close' }).click()
+
+  await page.reload()
+  await expect(checkbox).toBeChecked({ timeout: 60_000 })
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  await lore.scrollIntoViewIfNeeded()
+  const viewport = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }))
+  expect(viewport.scrollWidth).toBe(viewport.clientWidth)
+  expect(browserErrors).toEqual([])
+})
+
 async function clickMapFraction(page: Page, fx: number, fy: number) {
   const canvas = page.locator('canvas[data-map-canvas]')
   await expect(canvas).toBeVisible()

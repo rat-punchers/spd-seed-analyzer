@@ -4,6 +4,7 @@ use std::ffi::OsStr;
 
 #[test]
 fn aaa_floor_eighteen_matches_through_blobs() {
+    let _journal = crate::fresh_journal();
     let name = OsStr::new("aaa-aaa-aaa-final-heaps-floor-18.json");
     let path = fixture_paths()
         .into_iter()

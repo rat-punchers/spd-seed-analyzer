@@ -95,10 +95,16 @@ pub(in crate::level::special_loot) fn paint(
         record_drop(map, cell, item, &mut out);
     }
 
-    // A fresh-run oracle has all nine alchemy pages missing. At chapter two
-    // (prison) Java therefore drops two pages, one per chapter since target 1.
+    // A complete journal drops no pages. A fresh one has all nine alchemy
+    // pages missing, so at chapter two (prison) Java drops two pages, one per
+    // chapter since target 1.
     let chapter = 1 + dungeon.depth / 5;
-    for _ in 0..chapter.min(9) {
+    let pages = if crate::journal::lore_complete() {
+        0
+    } else {
+        chapter.min(9)
+    };
+    for _ in 0..pages {
         let mut page = GeneratedItem::new("AlchemyPage", ItemCategory::Other);
         page.source = Some("LaboratoryRoom".into());
         drop_item(map, room, page, &mut out);

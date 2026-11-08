@@ -13,6 +13,7 @@ fn fixture() -> OracleFixture {
 
 #[test]
 fn gfx_floor_six_secret_library_restores_preserved_run_lifecycle() {
+    let _journal = crate::fresh_journal();
     let path = fixture_paths()
         .into_iter()
         .find(|path| {
@@ -73,6 +74,7 @@ fn gfx_floor_six_secret_library_restores_preserved_run_lifecycle() {
 
 #[test]
 fn hkt_floor_six_lifecycle_matches_oracle() {
+    let _journal = crate::fresh_journal();
     let fixture = fixture();
     let expected = fixture.floors.first().expect("floor-6 oracle facts");
     assert_eq!(fixture.schema_version, EXTENDED_FINAL_HEAPS_SCHEMA_VERSION);

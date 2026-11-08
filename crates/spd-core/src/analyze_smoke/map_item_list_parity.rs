@@ -105,12 +105,19 @@ fn floor_item_lists_cover_all_non_plumbing_map_heaps_and_mimic_drops() {
         .any(|item| item.item == Some(ItemId::Pasty)));
 
     let darkness =
-        analyze_seed_for_run("FVX-YTN-SLC", 8, None, &[Challenge::IntoDarkness]).unwrap();
+        analyze_seed_for_run("FVX-YTN-SLC", 8, None, &[Challenge::IntoDarkness], true).unwrap();
     assert_map_items_listed("FVX-YTN-SLC:into_darkness", &darkness.floors);
 
     for seed in 0..16 {
         let input = seed.to_string();
         let report = analyze_seed(&input, 15).unwrap();
         assert_map_items_listed(&input, &report.floors);
+    }
+
+    let _journal = crate::journal::scope_lore_complete(false);
+    for seed in 0..4 {
+        let input = seed.to_string();
+        let report = analyze_seed(&input, 15).unwrap();
+        assert_map_items_listed(&format!("{input}:fresh_journal"), &report.floors);
     }
 }

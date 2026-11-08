@@ -4,6 +4,7 @@ use std::ffi::OsStr;
 
 #[test]
 fn gfx_floor_three_lifecycle_matches_v4_oracle() {
+    let _journal = crate::fresh_journal();
     let name = OsStr::new("gfx-pzh-dch-final-heaps-floor-3.json");
     let path = fixture_paths()
         .into_iter()

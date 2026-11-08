@@ -279,6 +279,8 @@ fn gfx_floor_three_golden_mimic_advances_the_extra_weapon_deck() {
 
 #[test]
 fn gfx_floor_nineteen_create_items_preserves_java_weapon_decks() {
+    // Pinned to a fresh-journal Java oracle run.
+    let _journal = crate::journal::scope_lore_complete(false);
     let fixture: Fixture = serde_json::from_str(GFX_ORACLE_JSON).expect("lifecycle fixture JSON");
     let expected = fixture
         .boundaries
@@ -305,6 +307,8 @@ fn gfx_floor_nineteen_create_items_preserves_java_weapon_decks() {
 
 #[test]
 fn gfx_city_boss_imp_shop_preserves_artifact_deck_for_halls() {
+    // Pinned to a fresh-journal Java oracle run.
+    let _journal = crate::journal::scope_lore_complete(false);
     let seed = crate::parse_seed("GFX-PZH-DCH").expect("seed");
     let mut dungeon = dungeon_from_run(init_run(seed.numeric));
     for depth in 1..=20 {

@@ -9,6 +9,7 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Field,
   FieldContent,
@@ -146,6 +147,15 @@ export function ControlsSpecimen() {
                 <FieldLabel htmlFor="deep-search">Deep search</FieldLabel>
                 <FieldDescription>
                   Also match Imp and Wandmaker rewards. Slower.
+                </FieldDescription>
+              </FieldContent>
+            </Field>
+            <Field orientation="horizontal">
+              <Checkbox id="lore-pages" />
+              <FieldContent>
+                <FieldLabel htmlFor="lore-pages">Show lore pages</FieldLabel>
+                <FieldDescription>
+                  Place guide and alchemy pages, as on a new journal.
                 </FieldDescription>
               </FieldContent>
             </Field>

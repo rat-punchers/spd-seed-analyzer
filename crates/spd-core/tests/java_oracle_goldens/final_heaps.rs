@@ -105,6 +105,7 @@ fn assert_main_loop_heaps_match(
 
 #[test]
 fn every_covered_main_loop_spawn_matches_java_final_heaps() {
+    let _journal = crate::fresh_journal();
     let mut compared_floors = 0;
     let mut compared_items = 0;
 
@@ -266,6 +267,7 @@ fn assert_aaa_aad_public_report_facts(
 
 #[test]
 fn aaa_aad_public_seed_presence_matches_v4_oracle() {
+    let _journal = crate::fresh_journal();
     let path = fixture_paths()
         .into_iter()
         .find(|path| {
@@ -281,6 +283,7 @@ fn aaa_aad_public_seed_presence_matches_v4_oracle() {
 
 #[test]
 fn depth_one_final_heaps_match_report_projection() {
+    let _journal = crate::fresh_journal();
     let mut compared = 0;
     for path in fixture_paths() {
         let fixture = read_fixture(&path);
@@ -624,6 +627,7 @@ fn depth_one_final_heaps_match_report_projection() {
 
 #[test]
 fn barren_land_fixture_declares_its_challenge_profile() {
+    let _journal = crate::fresh_journal();
     let path = fixture_paths()
         .into_iter()
         .find(|path| {
@@ -638,6 +642,7 @@ fn barren_land_fixture_declares_its_challenge_profile() {
 
 #[test]
 fn rat_skull_fixtures_declare_profile_state() {
+    let _journal = crate::fresh_journal();
     let mut found = 0;
     for path in fixture_paths() {
         let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
@@ -658,6 +663,7 @@ fn rat_skull_fixtures_declare_profile_state() {
 
 #[test]
 fn rat_skull_fixtures_cover_crystal_vault_and_statue_boundaries() {
+    let _journal = crate::fresh_journal();
     let mut depths = Vec::new();
     for path in fixture_paths() {
         let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
@@ -685,6 +691,7 @@ fn rat_skull_fixtures_cover_crystal_vault_and_statue_boundaries() {
 
 #[test]
 fn trinket_fixtures_replay_exact_profiled_floor_state() {
+    let _journal = crate::fresh_journal();
     let mut failures = Vec::new();
     fn normalize(mut heaps: Vec<OracleHeap>) -> Vec<OracleHeap> {
         for heap in &mut heaps {
@@ -874,6 +881,7 @@ fn oracle_heap_enchantments(path: &std::path::Path) -> Vec<(u32, String, String)
 
 #[test]
 fn aaa_floor_four_barren_land_matches_secret_garden_oracle() {
+    let _journal = crate::fresh_journal();
     let path = fixture_paths()
         .into_iter()
         .find(|path| {
@@ -946,6 +954,7 @@ fn aaa_floor_four_barren_land_matches_secret_garden_oracle() {
 
 #[test]
 fn aaa_floor_three_forbidden_runes_suppresses_even_upgrade_scroll() {
+    let _journal = crate::fresh_journal();
     let path = fixture_paths()
         .into_iter()
         .find(|path| {
@@ -1017,6 +1026,7 @@ fn aaa_floor_three_forbidden_runes_suppresses_even_upgrade_scroll() {
 
 #[test]
 fn aaa_floor_fifteen_badder_bosses_matches_caves_layout_and_rng() {
+    let _journal = crate::fresh_journal();
     let path = fixture_paths()
         .into_iter()
         .find(|path| {

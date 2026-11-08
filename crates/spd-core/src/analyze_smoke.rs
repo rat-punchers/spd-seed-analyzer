@@ -578,6 +578,8 @@ fn no_op_spawn_dependencies_are_not_serialized() {
 
 #[test]
 fn pub_cli_vnw_groups_the_depth_four_sacrifice_reward() {
+    // Pinned to a fresh-journal Java oracle run.
+    let _journal = crate::journal::scope_lore_complete(false);
     let report = analyze_seed("PUB-CLI-VNW", 4).expect("analyze");
     let floor = report
         .floors

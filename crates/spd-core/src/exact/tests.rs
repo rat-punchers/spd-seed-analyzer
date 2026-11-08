@@ -31,6 +31,8 @@ fn reports_every_requested_floor_without_predictions() {
 
 #[test]
 fn formerly_constrained_entries_are_concrete() {
+    // Pinned to a fresh-journal Java oracle run.
+    let _journal = crate::journal::scope_lore_complete(false);
     let report = report(false);
     let shop = &floor(&report, 6).items;
     for class_name in [

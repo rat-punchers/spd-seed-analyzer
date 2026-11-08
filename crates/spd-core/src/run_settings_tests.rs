@@ -39,7 +39,7 @@ fn has_challenge_condition(report: &SeedReport) -> bool {
 
 #[test]
 fn no_challenges_is_the_trinket_report() {
-    let declared = analyze_seed_for_run("7", 3, None, &[]).unwrap();
+    let declared = analyze_seed_for_run("7", 3, None, &[], true).unwrap();
     let plain = analyze_seed_with_trinket("7", 3, None).unwrap();
     assert_eq!(
         serde_json::to_value(declared).unwrap(),
@@ -50,8 +50,14 @@ fn no_challenges_is_the_trinket_report() {
 #[test]
 fn forbidden_runes_moves_floor_two_keys_without_challenge_conditions() {
     let plain = analyze_seed_with_trinket(NINE_CHALLENGE_SEED, 2, None).unwrap();
-    let runes =
-        analyze_seed_for_run(NINE_CHALLENGE_SEED, 2, None, &[Challenge::ForbiddenRunes]).unwrap();
+    let runes = analyze_seed_for_run(
+        NINE_CHALLENGE_SEED,
+        2,
+        None,
+        &[Challenge::ForbiddenRunes],
+        true,
+    )
+    .unwrap();
 
     assert_eq!(
         heap_cells(displayed_map(&plain, 2), ItemId::IronKey),
@@ -67,8 +73,14 @@ fn forbidden_runes_moves_floor_two_keys_without_challenge_conditions() {
 
 #[test]
 fn into_darkness_places_a_torch_on_regular_floors() {
-    let report =
-        analyze_seed_for_run(NINE_CHALLENGE_SEED, 2, None, &[Challenge::IntoDarkness]).unwrap();
+    let report = analyze_seed_for_run(
+        NINE_CHALLENGE_SEED,
+        2,
+        None,
+        &[Challenge::IntoDarkness],
+        true,
+    )
+    .unwrap();
     assert_eq!(
         heap_cells(displayed_map(&report, 2), ItemId::Torch),
         [(15, 19)]
@@ -98,10 +110,46 @@ fn every_generation_challenge_is_modeled() {
     }
 }
 
+fn page_count(report: &SeedReport, page: ItemId) -> usize {
+    report
+        .floors
+        .iter()
+        .filter_map(|floor| floor.map.as_ref().or(floor.assumed_map.as_ref()))
+        .flat_map(|map| &map.heaps)
+        .flat_map(|heap| &heap.items)
+        .filter(|item| item.item == page)
+        .count()
+}
+
+#[test]
+fn complete_journal_spawns_no_lore_pages() {
+    let report = analyze_seed_for_run("7", 12, None, &[], true).unwrap();
+    assert_eq!(page_count(&report, ItemId::GuidePage), 0);
+    assert_eq!(page_count(&report, ItemId::AlchemyPage), 0);
+    assert!(crate::journal::lore_complete());
+}
+
+#[test]
+fn fresh_journal_spawns_guide_and_alchemy_pages() {
+    let report = analyze_seed_for_run("7", 12, None, &[], false).unwrap();
+    assert!(page_count(&report, ItemId::GuidePage) > 0);
+    assert!(page_count(&report, ItemId::AlchemyPage) > 0);
+    assert!(
+        crate::journal::lore_complete(),
+        "the journal state reverts after the run"
+    );
+}
+
 #[test]
 fn champion_runs_publish_every_floor_map() {
-    let report =
-        analyze_seed_for_run(NINE_CHALLENGE_SEED, 6, None, &[Challenge::ChampionEnemies]).unwrap();
+    let report = analyze_seed_for_run(
+        NINE_CHALLENGE_SEED,
+        6,
+        None,
+        &[Challenge::ChampionEnemies],
+        true,
+    )
+    .unwrap();
     let first = &report.floors[0];
     let map = first.map.as_ref().expect("floor 1 champion is seeded");
     assert!(map.uncertain_cells.is_empty());

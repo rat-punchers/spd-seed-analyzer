@@ -782,7 +782,7 @@ test('finder result displays only matched constraints', async ({ page }) => {
   ).toBeVisible()
   await page
     .getByRole('spinbutton', { name: 'Start seed' })
-    .fill('3755006876548')
+    .fill('3755006876613')
   await page.getByRole('spinbutton', { name: 'Candidates' }).fill('10')
   await page.getByLabel('Item 1 depth').selectOption('17')
   await page.getByRole('spinbutton', { name: 'Results' }).fill('1')
@@ -790,7 +790,7 @@ test('finder result displays only matched constraints', async ({ page }) => {
   await page.getByLabel('Item 1 upgrade level').selectOption('4')
   await page.getByRole('button', { name: 'Find' }).click()
 
-  await expect(page.getByText('RZN-LKU-EFS', { exact: true })).toBeVisible({
+  await expect(page.getByText('RZN-LKU-EIF', { exact: true })).toBeVisible({
     timeout: 60_000,
   })
   await expect(

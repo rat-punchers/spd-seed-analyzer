@@ -340,6 +340,8 @@ mod tests {
 
     #[test]
     fn fixed_profile_rewards_match_committed_java_fixtures() {
+        // Pinned to a fresh-journal Java oracle run.
+        let _journal = crate::journal::scope_lore_complete(false);
         let cases = [
             (
                 "AAA-AAA-AAA",

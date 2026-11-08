@@ -33,6 +33,7 @@ struct Entry {
 
 #[test]
 fn secret_library_hash_map_order_is_pinned_by_java_oracle() {
+    let _journal = crate::fresh_journal();
     let path = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../tools/java-oracle/fixtures/secret/secret-library-order.json");
     let fixture: Fixture = serde_json::from_str(&fs::read_to_string(path).expect("read fixture"))

@@ -11,6 +11,7 @@ pub mod generator;
 pub mod geom;
 pub mod items;
 pub mod java_random;
+pub mod journal;
 pub mod level;
 pub mod quests;
 pub mod random;

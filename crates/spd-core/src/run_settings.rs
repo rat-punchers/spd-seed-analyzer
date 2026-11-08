@@ -13,7 +13,23 @@ use crate::{
 /// condition. Without a trinket, the Catalyst routes stay open as
 /// conditions; with one, no alternatives are enumerated. An empty challenge
 /// list is [`analyze_seed_with_trinket`].
+///
+/// `lore_complete` is the player's journal (see [`crate::journal`]): `true`,
+/// the default elsewhere, spawns no guide or alchemy pages; `false` replays
+/// a fresh journal, whose pages appear on the floors.
 pub fn analyze_seed_for_run(
+    input: &str,
+    floors: u32,
+    trinket: Option<TrinketKind>,
+    challenges: &[Challenge],
+    lore_complete: bool,
+) -> Result<SeedReport, AnalyzeError> {
+    crate::journal::with_lore_complete(lore_complete, || {
+        analyze_declared_run(input, floors, trinket, challenges)
+    })
+}
+
+fn analyze_declared_run(
     input: &str,
     floors: u32,
     trinket: Option<TrinketKind>,

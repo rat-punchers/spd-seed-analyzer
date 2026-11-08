@@ -157,6 +157,7 @@ fn merge_gold(mut heap: OracleHeap) -> OracleHeap {
 /// later queued drop (keys included); Into Darkness adds the floor torch.
 #[test]
 fn fvx_floor_two_all_challenges_matches_oracle() {
+    let _journal = crate::fresh_journal();
     assert_all_challenge_floor("fvx-ytn-slc-final-heaps-floor-2-all-challenges.json");
 }
 
@@ -164,6 +165,7 @@ fn fvx_floor_two_all_challenges_matches_oracle() {
 /// no possible Giant outside open space, so the replay matches it anyway.
 #[test]
 fn fvx_later_floors_all_challenges_match_oracle() {
+    let _journal = crate::fresh_journal();
     for depth in [4, 8, 12] {
         assert_all_challenge_floor(&format!(
             "fvx-ytn-slc-final-heaps-floor-{depth}-all-challenges.json"
@@ -175,6 +177,7 @@ fn fvx_later_floors_all_challenges_match_oracle() {
 /// On these seeds it is a LARGE Giant that has to move to open space.
 #[test]
 fn floor_one_giant_champion_matches_oracle() {
+    let _journal = crate::fresh_journal();
     for seed in ["aaa-aaa-acv", "aaa-aaa-aes"] {
         assert_challenge_floor(
             &format!("{seed}-final-heaps-floor-1-champion-enemies.json"),
@@ -188,6 +191,7 @@ fn floor_one_giant_champion_matches_oracle() {
 /// a Rot Garden (floor 8), and a Caves Secret Garden (floor 11).
 #[test]
 fn garden_floors_with_barren_land_match_oracle() {
+    let _journal = crate::fresh_journal();
     for fixture in [
         "aaa-aaa-aan-final-heaps-floor-2-barren-land.json",
         "aaa-aaa-aag-final-heaps-floor-8-barren-land.json",

@@ -481,6 +481,8 @@ fn finder_variable_highlights_exclude_promoted_floor_one_rewards() {
 
 #[test]
 fn sacrifice_sickle_requires_variable_opt_in_and_is_labeled() {
+    // Pinned to a fresh-journal Java oracle run.
+    let _journal = crate::journal::scope_lore_complete(false);
     let numeric = crate::parse_seed("PUB-CLI-VNW")
         .expect("fixture seed")
         .numeric;

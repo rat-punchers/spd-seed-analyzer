@@ -152,6 +152,8 @@ fn generate_reward_options_at(seed: i64) -> Vec<GeneratedItem> {
 
 #[test]
 fn imp_ring_deck_fixture_pins_v4_spawn_draw_sites() {
+    // Pinned to a fresh-journal Java oracle run.
+    let _journal = crate::journal::scope_lore_complete(false);
     for fixture_json in RING_DECK_FIXTURES {
         let fixture: RingDeckFixture =
             serde_json::from_str(fixture_json).expect("Imp ring deck fixture");

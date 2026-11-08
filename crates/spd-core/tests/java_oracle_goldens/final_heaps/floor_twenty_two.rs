@@ -37,6 +37,7 @@ struct DoorTrace {
 
 #[test]
 fn gfx_floor_twenty_two_halls_paint_trace_matches_loop_builder_history() {
+    let _journal = crate::fresh_journal();
     assert_halls_paint_trace(
         "GFX-PZH-DCH",
         "gfx-pzh-dch-floor-22-halls-paint.json",
@@ -49,6 +50,7 @@ fn gfx_floor_twenty_two_halls_paint_trace_matches_loop_builder_history() {
 
 #[test]
 fn afu_floor_twenty_two_halls_paint_trace_matches_retry_history() {
+    let _journal = crate::fresh_journal();
     assert_halls_paint_trace(
         "AAA-AAA-AFU",
         "aaa-aaa-afu-floor-22-halls-paint.json",
@@ -61,6 +63,7 @@ fn afu_floor_twenty_two_halls_paint_trace_matches_retry_history() {
 
 #[test]
 fn aaa_floor_twenty_two_structural_lifecycle_matches_oracle() {
+    let _journal = crate::fresh_journal();
     let name = OsStr::new("aaa-aaa-aaa-final-heaps-floor-22.json");
     let path = fixture_paths()
         .into_iter()
@@ -186,6 +189,7 @@ fn aaa_floor_twenty_two_structural_lifecycle_matches_oracle() {
 
 #[test]
 fn abc_floor_twenty_two_paint_doors_matches_oracle() {
+    let _journal = crate::fresh_journal();
     let path = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../tools/java-oracle/fixtures/traces/abc-def-ghi-floor-22-halls-doors.json");
     let trace: DoorTrace = serde_json::from_str(

@@ -48,6 +48,8 @@ mod placement_oracle_tests {
 
     #[test]
     fn quest_npc_cells_and_reward_tails_match_oracle_matrix() {
+        // Pinned to a fresh-journal Java oracle run.
+        let _journal = crate::journal::scope_lore_complete(false);
         let fixture_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../../tools/java-oracle/fixtures/generator");
         let mut paths: Vec<_> = std::fs::read_dir(&fixture_dir)

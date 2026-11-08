@@ -306,9 +306,11 @@ impl LevelState {
         }
         // Deeper floors locate it at its default-profile room, like the
         // assumed map and the variable room samples.
-        if self.depth > 1 && self.expose_variable_items {
-            locate_in_rooms(&mut items, &self.placed_items);
-        }
+        let relocated = if self.depth > 1 && self.expose_variable_items {
+            locate_in_rooms(&mut items, &self.placed_items)
+        } else {
+            Vec::new()
+        };
         let mut shop_items = Vec::new();
         let mut has_shop = false;
         for (index, item) in self.placed_items.iter().enumerate() {
@@ -771,7 +773,7 @@ impl LevelState {
             }
         }
         // Default-profile samples join contracts in group_item_entries.
-        variable::append_unprojected_samples(&mut items, &variable_items);
+        variable::append_unprojected_samples(&mut items, &variable_items, &relocated);
         let mut items = merge_identical_items(items);
         items.retain(|entry| !entry.item.is_some_and(is_non_item));
         let public_map = || {

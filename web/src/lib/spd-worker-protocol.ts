@@ -12,6 +12,7 @@ export type SpdWorkerRequest =
       floors: number
       trinket: string | null
       challenges: Challenge[]
+      lorePages: boolean
     }
   | { type: 'search'; request: SeedSearchRequest }
 

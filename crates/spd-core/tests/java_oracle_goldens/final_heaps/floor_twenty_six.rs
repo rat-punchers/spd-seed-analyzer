@@ -4,6 +4,7 @@ use std::ffi::OsStr;
 
 #[test]
 fn last_level_matches_raw_java_layout_for_preserved_runs() {
+    let _journal = crate::fresh_journal();
     for name in [
         "aaa-aaa-aaa-final-heaps-floor-26.json",
         "abc-def-ghi-final-heaps-floor-26.json",

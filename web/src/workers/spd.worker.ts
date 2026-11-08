@@ -74,7 +74,8 @@ context.onmessage = async (event: MessageEvent<SpdWorkerRequest>) => {
         event.data.input,
         event.data.floors,
         event.data.trinket,
-        event.data.challenges
+        event.data.challenges,
+        event.data.lorePages
       )
       post({ type: 'analysis-complete', report })
       return

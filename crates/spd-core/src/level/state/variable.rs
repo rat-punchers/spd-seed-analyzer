@@ -71,10 +71,21 @@ pub(super) fn collect_samples(state: &LevelState) -> Vec<ItemEntry> {
 
 /// Append variable samples that are not already covered by `items` (such as
 /// exact room contracts like Double Bomb, Honeypot, or Energy Crystals).
-pub(super) fn append_unprojected_samples(items: &mut Vec<ItemEntry>, samples: &[ItemEntry]) {
+/// `relocated` guaranteed spawns are never sampled, so they cover nothing: a
+/// room can hold one beside a generated reward of the same class.
+pub(super) fn append_unprojected_samples(
+    items: &mut Vec<ItemEntry>,
+    samples: &[ItemEntry],
+    relocated: &[ItemEntry],
+) {
     let mut remaining = HashMap::<(spd_objects::ItemId, Option<String>), i32>::new();
+    let mut unsampled = relocated.to_vec();
     for entry in items.iter() {
         if is_room_spawn_queue_potion(entry) {
+            continue;
+        }
+        if let Some(pos) = unsampled.iter().position(|other| other == entry) {
+            unsampled.swap_remove(pos);
             continue;
         }
         let Some(item_id) = entry.item else {

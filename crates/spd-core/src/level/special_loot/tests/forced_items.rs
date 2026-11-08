@@ -145,6 +145,8 @@ fn treasury_room_pushes_iron_key() {
 
 #[test]
 fn laboratory_room_records_fresh_prison_chapter_loot_blob_and_key() {
+    // Pinned to a fresh-journal Java oracle run.
+    let _journal = crate::journal::scope_lore_complete(false);
     Random::reset_generators();
     let run = init_run(34);
     Random::push_generator_seeded(104);

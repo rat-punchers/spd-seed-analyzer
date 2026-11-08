@@ -1,7 +1,8 @@
 /**
  * Seed session lifecycle: open tabs, analyze, rehydrate, close.
  *
- * Persisted: open seed inputs, active tab id, per-seed trinket and challenges.
+ * Persisted: open seed inputs, active tab id, per-seed trinket, challenges,
+ * and lore pages.
  * Ephemeral: draft input, session runtime (reports), analyzing, form error.
  */
 
@@ -9,6 +10,7 @@ import { isCompleteCanonicalSeed } from '@/lib/canonical-seed'
 import type { Challenge, SeedReport } from '@/lib/spd-wasm'
 import { analyzeSeedInWorker, type WorkerTask } from '@/lib/spd-worker-client'
 import { challengeChoiceFor, setChallengeChoice } from './challenge-choices'
+import { loreChoiceFor, setLoreChoice } from './lore-choices'
 import { AppStore, derivedStore, persistentStore } from './store-utils'
 import { setTrinketChoice, trinketChoiceFor } from './trinket-choices'
 
@@ -46,6 +48,8 @@ export type SeedSession = {
   trinket: string | null
   /** Enabled generation-affecting challenges for this report. */
   challenges: Challenge[]
+  /** Floors replay a fresh journal, so guide and alchemy pages spawn. */
+  lorePages: boolean
   error: string | null
   startedAt: number | null
   finishedAt: number | null
@@ -165,15 +169,23 @@ function patchSession(id: string, patch: Partial<SeedSession>) {
 async function runAnalyze(id: string, input: string): Promise<boolean> {
   const trinket = trinketChoiceFor(id)
   const challenges = challengeChoiceFor(id)
+  const lorePages = loreChoiceFor(id)
   patchSession(id, {
     status: 'loading',
     trinket,
     challenges,
+    lorePages,
     error: null,
     startedAt: Date.now(),
     finishedAt: null,
   })
-  const task = analyzeSeedInWorker(input, ANALYZE_FLOORS, trinket, challenges)
+  const task = analyzeSeedInWorker(
+    input,
+    ANALYZE_FLOORS,
+    trinket,
+    challenges,
+    lorePages
+  )
   analyzeTasks.get(id)?.cancel()
   analyzeTasks.set(id, task)
   try {
@@ -218,6 +230,7 @@ export function closeSeedSession(id: string) {
   closedIds.add(id)
   setTrinketChoice(id, null)
   setChallengeChoice(id, [])
+  setLoreChoice(id, false)
   analyzeTasks.get(id)?.cancel()
   analyzeTasks.delete(id)
   const prev = $sessions.get()
@@ -281,6 +294,25 @@ export async function selectChallenges(
   }
 }
 
+/**
+ * Show or hide the journal's lore pages for a seed and regenerate. The
+ * previous report stays visible meanwhile.
+ */
+export async function selectLorePages(
+  id: string,
+  lorePages: boolean
+): Promise<void> {
+  const session = $sessions.get().find((item) => item.id === id)
+  if (!session || loreChoiceFor(id) === lorePages) return
+  setLoreChoice(id, lorePages)
+  $analyzing.set(true)
+  try {
+    await runAnalyze(id, session.input)
+  } finally {
+    $analyzing.set(analyzeTasks.size > 0)
+  }
+}
+
 async function analyzeSeedInputInternal(
   rawInput: string,
   clearDraftOnCreate: boolean
@@ -314,6 +346,7 @@ async function analyzeSeedInputInternal(
     closedIds.add(oldest.id)
     setTrinketChoice(oldest.id, null)
     setChallengeChoice(oldest.id, [])
+    setLoreChoice(oldest.id, false)
     nextSessions = nextSessions.slice(1)
   }
 
@@ -324,6 +357,7 @@ async function analyzeSeedInputInternal(
     report: null,
     trinket: null,
     challenges: [],
+    lorePages: false,
     error: null,
     startedAt: Date.now(),
     finishedAt: null,
@@ -396,6 +430,7 @@ export function startSessionRehydrate(): () => void {
       report: null,
       trinket: null,
       challenges: [],
+      lorePages: false,
       error: null,
       startedAt: null,
       finishedAt: null,

@@ -537,21 +537,27 @@ export async function parseSeed(input: string): Promise<SeedInfo> {
 
 /**
  * `trinket` is a Catalyst option class name held at +3; `challenges` are the
- * run's enabled challenges. Neither set is the default report.
+ * run's enabled challenges; `lorePages` replays a fresh journal, so guide and
+ * alchemy pages spawn. None set is the default report (complete journal).
  */
 export async function analyzeSeed(
   input: string,
   floors: number,
   trinket: string | null = null,
-  challenges: readonly Challenge[] = []
+  challenges: readonly Challenge[] = [],
+  lorePages = false
 ): Promise<SeedReport> {
   await ensureWasm()
   const report = (
-    trinket == null && challenges.length === 0
+    trinket == null && challenges.length === 0 && !lorePages
       ? wasmBindings.analyze_seed(input, floors)
-      : wasmBindings.analyze_seed_for_run(input, floors, trinket ?? undefined, [
-          ...challenges,
-        ])
+      : wasmBindings.analyze_seed_for_run(
+          input,
+          floors,
+          trinket ?? undefined,
+          [...challenges],
+          !lorePages
+        )
   ) as SeedReport
   for (const floor of report.floors) {
     decodeMaps(floor)

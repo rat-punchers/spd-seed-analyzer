@@ -18,7 +18,8 @@ export function analyzeSeedInWorker(
   input: string,
   floors: number,
   trinket: string | null,
-  challenges: readonly Challenge[]
+  challenges: readonly Challenge[],
+  lorePages: boolean
 ): WorkerTask<SeedReport> {
   const worker = createWorker()
   let rejectTask: (reason: Error) => void = () => {}
@@ -41,6 +42,7 @@ export function analyzeSeedInWorker(
       floors,
       trinket,
       challenges: [...challenges],
+      lorePages,
     } satisfies SpdWorkerRequest)
   })
   return {

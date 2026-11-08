@@ -37,6 +37,7 @@ struct Reward {
 
 #[test]
 fn parchment_three_floor_thirteen_sacrifice_reward_matches_java() {
+    let _journal = crate::fresh_journal();
     let fixture: Fixture = serde_json::from_str(include_str!(
         "../../../../tools/java-oracle/fixtures/player-state/hkt-jzn-xqq-sacrifice-reward-parchment-3.json"
     ))

@@ -26,6 +26,12 @@ mod secret_library;
 #[path = "java_oracle_goldens/toxic_gas.rs"]
 mod toxic_gas;
 
+/// The oracle runs on a fresh journal (only the intro page read), so guide
+/// and alchemy pages spawn and consume RNG.
+fn fresh_journal() -> spd_core::journal::LoreScope {
+    spd_core::journal::scope_lore_complete(false)
+}
+
 #[derive(Debug, Deserialize)]
 struct OracleFixture {
     schema_version: u32,
@@ -289,6 +295,7 @@ fn identity_pairs(entries: &[IdentityEntry]) -> Vec<OracleIdentity> {
 
 #[test]
 fn run_identities_match_pinned_java_oracle() {
+    let _journal = crate::fresh_journal();
     for path in fixture_paths() {
         let fixture = read_fixture(&path);
         let context = path.display();
@@ -342,6 +349,7 @@ fn run_identities_match_pinned_java_oracle() {
 
 #[test]
 fn depth_one_forced_items_match_pinned_java_oracle() {
+    let _journal = crate::fresh_journal();
     let mut compared = 0;
     for path in legacy_floor_fixture_paths() {
         let fixture = read_fixture(&path);

@@ -4,6 +4,7 @@ use std::ffi::OsStr;
 
 #[test]
 fn aaa_replay_pins_floors_six_through_eleven_across_the_tengu_lifecycle() {
+    let _journal = crate::fresh_journal();
     let fixtures: Vec<_> = [6, 7, 8, 9, 11]
         .into_iter()
         .map(|depth| {
@@ -400,6 +401,7 @@ fn aaa_replay_pins_floors_six_through_eleven_across_the_tengu_lifecycle() {
 
 #[test]
 fn aaa_floor_twelve_matches_the_pinned_layout_and_item_lifecycle() {
+    let _journal = crate::fresh_journal();
     let name = OsStr::new("aaa-aaa-aaa-final-heaps-floor-12.json");
     let path = fixture_paths()
         .into_iter()
@@ -500,6 +502,7 @@ fn aaa_floor_twelve_matches_the_pinned_layout_and_item_lifecycle() {
 
 #[test]
 fn aaa_floor_thirteen_matches_the_pinned_final_facts() {
+    let _journal = crate::fresh_journal();
     let name = OsStr::new("aaa-aaa-aaa-final-heaps-floor-13.json");
     let path = fixture_paths()
         .into_iter()
@@ -582,6 +585,7 @@ fn aaa_floor_thirteen_matches_the_pinned_final_facts() {
 
 #[test]
 fn aaa_floor_fourteen_matches_the_pinned_final_facts() {
+    let _journal = crate::fresh_journal();
     let name = OsStr::new("aaa-aaa-aaa-final-heaps-floor-14.json");
     let path = fixture_paths()
         .into_iter()

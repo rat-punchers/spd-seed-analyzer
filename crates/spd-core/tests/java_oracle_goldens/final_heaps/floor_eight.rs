@@ -5,6 +5,7 @@ mod parity;
 
 #[test]
 fn hkt_floor_eight_lifecycle_matches_oracle() {
+    let _journal = crate::fresh_journal();
     let path = fixture_paths()
         .into_iter()
         .find(|path| {

@@ -7,6 +7,7 @@ import {
   cancelSeedAnalysis,
   type SeedSession,
   selectChallenges,
+  selectLorePages,
   selectTrinket,
 } from '@/stores/app'
 
@@ -72,6 +73,13 @@ export function SessionPane({ session }: { session: SeedSession }) {
             busy: loading,
             select: (trinket) => {
               void selectTrinket(session.id, trinket)
+            },
+          }}
+          loreChoice={{
+            shown: session.lorePages,
+            busy: loading,
+            select: (shown) => {
+              void selectLorePages(session.id, shown)
             },
           }}
           challengeChoice={{

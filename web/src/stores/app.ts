@@ -56,6 +56,7 @@ export {
   type SeedSession,
   type SessionStatus,
   selectChallenges,
+  selectLorePages,
   selectTrinket,
   sessionIdFor,
   setActiveSeed,

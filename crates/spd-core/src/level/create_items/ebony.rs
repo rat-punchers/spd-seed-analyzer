@@ -33,10 +33,10 @@ pub(super) fn spawn(
     };
 
     let mut candidates = Vec::new();
-    // Floor 2's entrance guide page is a plain heap too, but
-    // `EntranceRoom.placeEarlyGuidePages` drops it with an unseeded generator:
-    // it counts as a candidate while its `IntMap` position, and so the pick,
-    // is unknown.
+    // On a fresh journal, floor 2's entrance guide page is a plain heap too,
+    // but `EntranceRoom.placeEarlyGuidePages` drops it with an unseeded
+    // generator: it counts as a candidate while its `IntMap` position, and so
+    // the pick, is unknown.
     let mut unplaced_page = false;
     if Random::int_max(2) == 0 {
         let heaps = level_heaps(map, created);
@@ -47,7 +47,7 @@ pub(super) fn spawn(
                 candidates.push(cell);
             }
         }
-        unplaced_page = dungeon.depth == 2;
+        unplaced_page = dungeon.depth == 2 && !crate::journal::lore_complete();
     }
 
     if unplaced_page {

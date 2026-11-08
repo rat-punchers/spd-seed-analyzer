@@ -70,10 +70,20 @@ wands still stop at +4. The Deep search switch fills the seed-only Imp and Wandm
 the same class window so those quest rewards can be matched at all; it is off
 by default.
 
+Generation assumes a complete journal by default (`spd_core::journal`): no
+Adventurer's Guide or Alchemy Guide pages spawn, and their rolls consume no
+RNG. The run header's "Lore pages" checkbox (off by default, persisted per
+seed) replays a fresh journal instead, matching the Java oracle fixtures,
+which opt in via `scope_lore_complete(false)`. Laboratory pages draw from the
+level RNG, so the toggle can move later room loot. Not modeled: region lore
+pages (they need a complete guide with an incomplete region document) and the
+fresh journal's hidden floor-2 entrance doors.
+
 Each report opens with a run header: the seed in the pixel font with a copy
-button, and toggles for the five challenges that change generated floors
+button, the lore page checkbox, and toggles for the five challenges that change generated floors
 (`Challenge::generation_effect`). Toggling calls `analyze_seed_for_run`
-(WASM export of the same name) with the trinket pick and challenge list;
+(WASM export of the same name) with the trinket pick, challenge list, and
+journal state;
 declared challenges are never spawn conditions, and choices persist per seed
 in localStorage. Forbidden Runes, Barren Land, Into Darkness (floor torch,
 `RegularLevel.java:472-490`) and Badder Bosses are replayed and match
@@ -103,8 +113,8 @@ panel: the converted heap item, the generated prize, and the Mimic Tooth
 extra when one is held. Ebony mimics (Mimic Tooth only) carry the prize,
 the tooth extra, and one more default item, each uncursed and at least +1.
 Crystal mimics keep the uncursed vault prize and lose it if they escape. Animated statues carry their enchanted weapon on both the floor list and the map inspect panel; armored statues also carry and drop their inscribed armor.
-On floor 2 an ebony mimic's cell can depend on the unseeded entrance guide
-page, and is then left off the map. Java oracle fixtures cover Mimic Tooth
+With lore pages shown, a floor-2 ebony mimic's cell can depend on the
+unseeded entrance guide page, and is then left off the map. Java oracle fixtures cover Mimic Tooth
 +3 floors (`*-mimic-tooth-3-before-*.json`).
 
 Every public object is a numeric id from `crates/spd-objects` (items,

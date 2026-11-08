@@ -193,6 +193,8 @@ added to the stock set:
 - `Tabs`: `default` is a recessed tray with a raised active tab; `line` marks
   the active tab with a 2px lantern bar.
 - `Switch`: a square thumb on a recessed track.
+- `Checkbox`: a recessed well that fills with lantern and a bold check when
+  checked.
 - `Progress`: a recessed, square-ended gauge.
 
 `src/components/spd/` holds the game pieces:

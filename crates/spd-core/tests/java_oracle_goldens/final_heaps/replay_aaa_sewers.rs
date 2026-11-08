@@ -4,6 +4,7 @@ use std::ffi::OsStr;
 
 #[test]
 fn aaa_replay_pins_floors_two_through_four() {
+    let _journal = crate::fresh_journal();
     let fixtures: Vec<_> = (2..=4)
         .map(|depth| {
             let name = format!("aaa-aaa-aaa-final-heaps-floor-{depth}.json");
