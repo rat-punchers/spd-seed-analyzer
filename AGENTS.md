@@ -26,6 +26,7 @@ bun install
 bun run dev          # wasm-pack + Vite
 bun run build
 bun run deploy       # build + Cloudflare Worker SPA (wrangler)
+bun run credentials  # guided prod-environment deploy vars + Cloudflare token (--dry-run)
 bun run design       # design-system preview (Vite, :5174)
 bun run build:design # type-check + build the design-system preview
 bun run test:rust    # cargo test -p spd-core

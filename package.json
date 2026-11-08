@@ -15,6 +15,7 @@
     "dev": "bun run build:wasm && bun run --filter spd-seed-analyzer-web dev",
     "build": "bun run build:wasm && bun run --filter spd-seed-analyzer-web build",
     "deploy": "bun run build && bun run --filter spd-seed-analyzer-web deploy",
+    "credentials": "bun scripts/credentials/main.ts",
     "preview": "bun run --filter spd-seed-analyzer-web preview",
     "design": "bun run --filter @spd-seed-analyzer/design dev",
     "build:design": "bun run --filter @spd-seed-analyzer/design build",
